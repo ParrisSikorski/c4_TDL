@@ -180,7 +180,7 @@ function get_TDL_json_populate_multiple() {
         url: 'http://s-apis.learningfuze.com/todo/get',
         method: 'POST',
         data: {
-            userId: $('#id').val(),
+            userId: response.id,
         },
         cache: false,
         crossDomain: true,
@@ -232,10 +232,10 @@ function login_to_server() {
             cache: false,
             crossDomain: true,
             success: function(response) {
-                window.response = response;
+                window.login_response = response;
                 if (response.success) {
                     load_user_data()
-                    sesssion = response.session_id;
+                    session = login_response.session_id;
                     $('.alert').remove();
                 } else if (!response.success) {
                     if (login_clicked) {
