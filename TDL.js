@@ -7,9 +7,6 @@ var todo_items_object = {
 };
 var todo_items_array = [];
 var update_array = [];
-var session;
-var name_user;
-
 
 function todo_initialize() {
         var todo_initialize = Object.create(todo_items_object);
@@ -56,26 +53,10 @@ function populate_todo_list() {
 
         var update_button = $('<button>').attr('type', 'button').text('update').attr('data_index', i);
 
-        // var p2_button = $("<button>", {
-        //     type: 'button',
-        //     class: 'button',
-        //     text: "priority 2",
-        //     data_index: i
-        // });
-
-        // var p3_button = $("<button>", {
-        //     type: 'button',
-        //     class: 'button',
-        //     text: "priority 3",
-        //     data_index: i
-        // });
-
-        // var p4_button = $("<button>", {
-        //     type: 'button',
-        //     class: 'button',
-        //     text: 'priority 4',
-        //     data_index: i
-        // });
+        var postId_num = $("<li>", {
+            class: 'list_item_num list-group-item',
+            text: "Post Id number: " + todo_items_array[i].id,
+        });
 
         var list_item_num = $("<li>", {
             class: 'list_item_num list-group-item',
@@ -96,17 +77,14 @@ function populate_todo_list() {
             class: 'to_do_details list-group-item',
             text: "details: " + todo_items_array[i].details,
         });
-
+        // Parris created comparison between timestamp and current date and will highlight red if current date has past
         var selected_timeStamp = Date.parse(todo_items_array[i].timeStamp);
         var dateInMS = Date.now();
         if (selected_timeStamp < dateInMS) {
-            $(TD_item).addClass('pastDue')
-        }
-        if (todo_items_array[i].complete == 1) {
-            $(title).addClass('completed_item');
+            $(TD_item).addClass('pastDue');
         }
         // $(TD_item).append(list_item_num, title, details, timestamp, delete_button, p1_button, p2_button, p3_button, p4_button);
-        $(TD_item).append(title, p1_button, update_button, complete_button, delete_button)
+        $(TD_item).append(title, p1_button, delete_button, update_button)
         $('#display_list').append(TD_item);
 
         delete_button.click(function() {
@@ -138,13 +116,13 @@ function populate_todo_list() {
             var title_display = $('<div>').html('title : ' + todo_items_array[index].title);
             var details_display = $('<div>').html('details : ' + todo_items_array[index].details);
             var timestamp_display = $('<div>').html('time : ' + todo_items_array[index].timeStamp);
+            var postId_display = $('<div>').html('postId : ' + todo_items_array[index].id);
 
-            $('.modal-body').append(title_display, details_display, timestamp_display);
+            $('.modal-body').append(title_display, details_display, timestamp_display, postId_display);
             $('#myModal').modal('show');
         })
 
         update_button.click(function() {
-            $('.modal-title').html('')
             $('.modal-body').html('');
             update_array = [];
             var index = $(this).parent().attr('data_index');
@@ -152,115 +130,162 @@ function populate_todo_list() {
             var title_update = $('<input>').attr('type', 'text').attr('placeholder', 'title').addClass('title_update');
             var details_update = $('<input>').attr('type', 'text').attr('placeholder', 'details').addClass('details_update');
             var time_update = $('<input>').attr('type', 'text').attr('placeholder', 'duedate').addClass('time_update');
+            var postId_display = $('<div>').html('postId : ' + todo_items_array[index].id);
             var submit_update = $('<button>').attr('type', 'submit').text('submit');
 
             submit_update.click(update_item);
-            $('.modal-title').html('Update for : ' + update_array[0].title)
+
             $('.modal-body').append(title_update, details_update, time_update, submit_update);
             $('#myModal').modal('show');
         });
-        //***********complete function needs to be added******************//
-        complete_button.click(function() {
-            update_array = [];
-            var index = $(this).parent().attr('data_index');
-            update_array.push(todo_items_array[index]);
-            if (update_array[0].complete == 0) {
-                update_array[0].complete = 1;
-                populate_todo_list();
-            } else if (update_array[0].complete == 1) {
-                update_array[0].complete = 0;
-                populate_todo_list();
-            }
-
-            item_complete_function();
-
-        });
-
-        //***********complete function needs to be added******************//
-
-
-
-
-
-        // this is being worked on to add priority
-        // p1_button.click(function() {
-        //     var index = $(this).parent().attr('data_index');
-        //     console.log("list item ", index + ' was clicked');
-        //     $(TD_item).addClass('list-group-item list-group-item-danger');
-        //     populate_todo_list();
-        // });
-
-        // p2_button.click(function() {
-        //     var index = $(this).parent().attr('data_index');
-        //     console.log("list item ", index + ' was clicked');
-        //     var priority = $(this).parent().addClass('list-group-item list-group-item-warning');
-        //     populate_todo_list();
-        // });
-
-        // p3_button.click(function() {
-        //     var index = $(this).parent().attr('data_index');
-        //     console.log("list item ", index + ' was clicked');
-        //     var priority = $(this).parent().addClass('list-group-item list-group-item-info');
-        //     populate_todo_list();
-        // });
-
-        // p4_button.click(function() {
-        //     var index = $(this).parent().attr('data_index');
-        //     console.log("list item ", index + ' was clicked');
-        //     var priority = $(this).parent().addClass('list-group-item list-group-item-success');
-        //     populate_todo_list();
-        // });
     }
 }
 
 function populate_todo_single() {
-
-    var iLN = parseFloat($('#id_LI').val());
+    $('#display_list').empty();
+    var iLN = parseFloat($('#input_search_id').val());
     console.log("item list number chosen: ", iLN);
     console.log("todo_items_array: ", todo_items_array);
-    for (var i = iLN; i < (iLN + 1); i++) {
+    // for (var i = iLN; i < (iLN + 1); i++) {
+        $('#display_list').empty();
         var TD_item = $("<ul>", {
             class: 'TD_item list-group',
-            id: todo_items_array[i - 1].id,
-            data_index: (i - 1)
+            id: todo_items_array[0].id,
+            data_index: 0
         });
 
         var delete_button = $("<button>", {
             type: 'button',
             class: 'button glyphicon glyphicon-remove-sign',
-            data_index: i
+            data_index: 0
         });
+
+        var p1_button = $("<button>", {
+            type: 'button',
+            class: 'button',
+            text: "show details",
+            data_index: 0
+        });
+
+        var complete_button = $('<button>').attr('type', 'button').text('complete').attr('data_index', 0);
+
+        var update_button = $('<button>').attr('type', 'button').text('update').attr('data_index', 0);
+
+        var postId_num = $("<li>", {
+            class: 'list_item_num list-group-item',
+            text: "Post Id number: " + todo_items_array[0].id,
+        });
+
         var list_item_num = $("<li>", {
             class: 'list_item_num list-group-item',
-            text: "list item number: " + (i)
+            text: "list item number: " + (1)
         });
 
         var timestamp = $("<li>", {
             class: 'to_do_timestamp list-group-item',
-            text: "time: " + todo_items_array[i - 1].timeStamp,
+            text: "time: " + todo_items_array[0].timeStamp,
         });
 
         var title = $("<li>", {
             class: 'to_do_title list-group-item',
-            text: "title: " + todo_items_array[i - 1].title,
+            text: "title: " + todo_items_array[0].title,
         });
 
         var details = $("<li>", {
             class: 'to_do_details list-group-item',
-            text: "details: " + todo_items_array[i - 1].details,
+            text: "details: " + todo_items_array[0].details,
         });
 
-        $(TD_item).append(list_item_num, title, details, timestamp, delete_button);
+        var selected_timeStamp = Date.parse(todo_items_array[0].timeStamp);
+        var dateInMS = Date.now();
+        if (selected_timeStamp < dateInMS) {
+            $(TD_item).addClass('pastDue');
+        }
+        // $(TD_item).append(list_item_num, title, details, timestamp, delete_button, p1_button, p2_button, p3_button, p4_button);
+        $(TD_item).append(title, p1_button, delete_button, update_button)
         $('#display_list').append(TD_item);
 
         delete_button.click(function() {
+            console.log(todo_items_array[0])
             var index = $(this).parent().attr('data_index');
             console.log("list item ", index + ' was clicked');
+
             todo_items_array.splice(index, 1);
-            index = $(this).parent().remove();
-            //populate_todo_single();
+            populate_todo_list();
+            $.ajax({
+                dataType: 'json',
+                url: 'http://s-apis.learningfuze.com/todo/delete',
+                method: 'POST',
+                data: {
+                    userId: response.Id,
+                    postId: global_response.data[0].id,
+                },
+                cache: false,
+                crossDomain: true,
+
+                success: function(response) {
+                    console.log(response)
+                }
+            });
         });
-    }
+        p1_button.click(function() {
+            $('.modal-body').html('');
+            var index = $(this).parent().attr('data_index');
+            var title_display = $('<div>').html('title : ' + todo_items_array[index].title);
+            var details_display = $('<div>').html('details : ' + todo_items_array[index].details);
+            var timestamp_display = $('<div>').html('time : ' + todo_items_array[index].timeStamp);
+            var postId_display = $('<div>').html('postId : ' + todo_items_array[index].id);
+
+            $('.modal-body').append(title_display, details_display, timestamp_display, postId_display);
+            $('#myModal').modal('show');
+        })
+
+        update_button.click(function() {
+            $('.modal-body').html('');
+            update_array = [];
+            var index = $(this).parent().attr('data_index');
+            update_array.push(todo_items_array[index]);
+            var title_update = $('<input>').attr('type', 'text').attr('placeholder', 'title').addClass('title_update');
+            var details_update = $('<input>').attr('type', 'text').attr('placeholder', 'details').addClass('details_update');
+            var time_update = $('<input>').attr('type', 'text').attr('placeholder', 'duedate').addClass('time_update');
+            var postId_display = $('<div>').html('postId : ' + todo_items_array[index].id);
+
+            var submit_update = $('<button>').attr('type', 'submit').text('submit');
+
+            submit_update.click(update_item);
+
+            $('.modal-body').append(title_update, details_update, time_update, submit_update, postId_display);
+            $('#myModal').modal('show');
+        });
+    // }
+}
+
+function postId_single() {
+    console.log("ajax call");
+    $.ajax({
+        dataType: 'json',
+        url: 'http://s-apis.learningfuze.com/todo/getByPostId',
+        method: 'POST',
+        data: {
+            postId: $('#input_search_id').val(),
+        },
+        cache: false,
+        crossDomain: true,
+
+        success: function(response) {
+            global_1response = response.data;
+            console.log('postid response : ', global_1response);
+            todo_items_array = [];
+            global_1response = response;
+            todo_items_array = todo_items_array.concat(global_1response.data);
+            console.log("response: ", global_1response);
+            console.log('todo_items_array: ', todo_items_array);
+            populate_todo_single();
+
+        }
+
+    });
+
 }
 
 function get_TDL_json_populate_multiple() {
@@ -286,6 +311,38 @@ function get_TDL_json_populate_multiple() {
         }
     });
 }
+
+
+// this is being worked on to add priority
+// p1_button.click(function() {
+//     var index = $(this).parent().attr('data_index');
+//     console.log("list item ", index + ' was clicked');
+//     $(TD_item).addClass('list-group-item list-group-item-danger');
+//     populate_todo_list();
+// });
+
+// p2_button.click(function() {
+//     var index = $(this).parent().attr('data_index');
+//     console.log("list item ", index + ' was clicked');
+//     var priority = $(this).parent().addClass('list-group-item list-group-item-warning');
+//     populate_todo_list();
+// });
+
+// p3_button.click(function() {
+//     var index = $(this).parent().attr('data_index');
+//     console.log("list item ", index + ' was clicked');
+//     var priority = $(this).parent().addClass('list-group-item list-group-item-info');
+//     populate_todo_list();
+// });
+
+// p4_button.click(function() {
+//     var index = $(this).parent().attr('data_index');
+//     console.log("list item ", index + ' was clicked');
+//     var priority = $(this).parent().addClass('list-group-item list-group-item-success');
+//     populate_todo_list();
+// });
+
+
 
 function get_TDL_json_populate_single() {
         console.log("ajax call");
@@ -324,10 +381,9 @@ function login_to_server() {
             success: function(response) {
                 window.response = response;
                 if (response.success) {
-                    delete
-                    load_user_data();
-                    document.cookie = 'sessionid=' + response.session_id;
-                    document.cookie = 'username=' + response.username;
+                    load_user_data()
+                    session = response.session_id;
+                    name_user = response.username;
                     $('.alert').remove();
                 } else if (!response.success) {
                     $('.alert').remove();
@@ -349,8 +405,8 @@ function logout_server() {
         dataType: 'json',
         url: 'http://s-apis.learningfuze.com/todo/logout',
         data: {
-            sid: getCookie('sessionid'),
-            username: getCookie('username'),
+            sid: session,
+            username: name_user,
         },
         method: 'POST',
         cache: false,
@@ -398,8 +454,9 @@ function load_user_data() {
                 todo_items_array.sort(sort_todo);
                 populate_todo_list
             });
-            get_TDL_json_populate_multiple();
-
+            $('#search_id_button').click(function() {
+                postId_single();
+            })
 
         }
     })
@@ -519,68 +576,6 @@ function update_item() {
                 $('.modal-body').html('')
                 $('.modal-body').html('Your item has been updated!');
                 $('#myModal').modal('show');
-                get_TDL_json_populate_multiple();
-
-            } else if (!response.success) {
-                $('.alert').remove();
-                var alert = $('<div>').addClass('alert alert-danger').html(response.errors[0]);
-                $('.modal-body').append(alert);
-            }
-
-
-        }
-
-    });
-}
-
-function item_complete_function() {
-    $.ajax({
-        dataType: 'json',
-        data: {
-            postId: update_array[0].id,
-            complete: update_array[0].complete,
-        },
-        method: 'POST',
-        url: 'http://s-apis.learningfuze.com/todo/updateCompleteStatus',
-        cache: false,
-        crossDomain: true,
-        success: function(response) {
-            window.response = response;
-            if (response.success) {
-                console.log(response);
-
-            } else if (!response.success) {
-                console.log(response)
-                $('.alert').remove();
-                var alert = $('<div>').addClass('alert alert-danger').html(response.errors);
-                $('.modal-body').append(alert);
-            }
-
-
-        }
-
-    });
-}
-
-function keep_user_logged_in() {
-    $.ajax({
-        dataType: 'json',
-        data: {
-            session_id: getCookie('sessionid'),
-        },
-        method: 'POST',
-        url: 'http://s-apis.learningfuze.com/todo/getLoggedInUserInfo',
-        cache: false,
-        crossDomain: true,
-        success: function(response) {
-            window.response = response;
-            if (response.success) {
-                console.log(response);
-                load_user_data();
-
-            } else if (!response.success) {
-
-                logout_to_mainpage();
 
             }
 
@@ -589,21 +584,10 @@ function keep_user_logged_in() {
 
     });
 }
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-    }
-    return "";
-}
-
-
 
 $(document).ready(function() {
+
+
     $('#create_account_button').click(function() {
         log_to_creation_page();
     })
@@ -627,9 +611,6 @@ $(document).ready(function() {
     $("N_user_name").change(function() {
         $('N_user_name').addClass('glyphicon glyphicon-ok')
     })
-    keep_user_logged_in();
-
-
 });
 
 //Parris function creation to populate DOM with response object data
